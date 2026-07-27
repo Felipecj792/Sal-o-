@@ -675,3 +675,172 @@ body {
     padding: 3px 8px;
   }
 }
+/* ===== ESTILOS PARA O FORMULÁRIO DE AGENDAMENTO ===== */
+
+/* Fundo do modal */
+.modal-overlay {
+  background: rgba(42, 31, 34, 0.5) !important;
+}
+
+/* Caixa do modal */
+.modal-box {
+  background: #FFFFFF !important;
+  border-radius: 20px !important;
+  box-shadow: 0 20px 60px rgba(66, 25, 42, 0.3) !important;
+}
+
+/* Cabeçalho do modal */
+.modal-header {
+  background: #5B2333 !important;
+  border-radius: 20px 20px 0 0 !important;
+  padding: 18px 22px !important;
+  border-bottom: none !important;
+}
+
+.modal-title {
+  color: #FFFFFF !important;
+  font-family: 'Playfair Display', serif !important;
+  font-size: 20px !important;
+}
+
+.modal-close {
+  color: #FFFFFF !important;
+}
+.modal-close:hover {
+  color: #E9D9BE !important;
+}
+
+/* Corpo do modal */
+.modal-body {
+  padding: 24px 22px !important;
+  background: #FBF6F3 !important;
+  border-radius: 0 0 20px 20px !important;
+}
+
+/* Labels dos campos */
+.field-label {
+  color: #5B2333 !important;
+  font-weight: 700 !important;
+  font-size: 11px !important;
+  letter-spacing: 0.5px !important;
+}
+
+/* Inputs e selects */
+.field-input,
+.select-custom,
+.textarea-custom {
+  background: #FFFFFF !important;
+  border: 2px solid #EEE0DC !important;
+  border-radius: 10px !important;
+  padding: 10px 12px !important;
+  font-size: 14px !important;
+  color: #2A1F22 !important;
+  transition: all 0.3s ease !important;
+}
+
+.field-input:focus,
+.select-custom:focus,
+.textarea-custom:focus {
+  border-color: #B8935A !important;
+  box-shadow: 0 0 0 3px rgba(184, 147, 90, 0.2) !important;
+  outline: none !important;
+}
+
+/* Tabs de cliente */
+.client-tabs {
+  display: flex !important;
+  gap: 8px !important;
+  margin-bottom: 10px !important;
+}
+
+.client-tab {
+  padding: 8px 16px !important;
+  border-radius: 8px !important;
+  font-size: 13px !important;
+  font-weight: 600 !important;
+  border: 2px solid #EEE0DC !important;
+  background: #FFFFFF !important;
+  color: #8A7477 !important;
+  cursor: pointer !important;
+  transition: all 0.3s ease !important;
+}
+
+.client-tab.active {
+  background: #5B2333 !important;
+  color: #FFFFFF !important;
+  border-color: #5B2333 !important;
+}
+
+.client-tab:hover:not(.active) {
+  background: #F1DCD8 !important;
+}
+
+/* Botões do modal */
+.modal-actions {
+  display: flex !important;
+  justify-content: flex-end !important;
+  gap: 10px !important;
+  margin-top: 16px !important;
+  padding-top: 16px !important;
+  border-top: 1px solid #EEE0DC !important;
+}
+
+.btn-cancel {
+  background: transparent !important;
+  border: 2px solid #EEE0DC !important;
+  color: #5B2333 !important;
+  padding: 10px 24px !important;
+  border-radius: 10px !important;
+  font-weight: 600 !important;
+  font-size: 14px !important;
+  cursor: pointer !important;
+  transition: all 0.3s ease !important;
+}
+
+.btn-cancel:hover {
+  background: #F1DCD8 !important;
+  border-color: #B8935A !important;
+}
+
+.btn-save {
+  background: #5B2333 !important;
+  color: #FFFFFF !important;
+  border: none !important;
+  padding: 10px 24px !important;
+  border-radius: 10px !important;
+  font-weight: 600 !important;
+  font-size: 14px !important;
+  cursor: pointer !important;
+  transition: all 0.3s ease !important;
+}
+
+.btn-save:hover {
+  background: #42192A !important;
+  transform: scale(1.02) !important;
+}
+
+/* Select com ícone de seta */
+.select-custom {
+  appearance: none !important;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%235B2333' d='M6 8L1 3h10z'/%3E%3C/svg%3E") !important;
+  background-repeat: no-repeat !important;
+  background-position: right 12px center !important;
+  padding-right: 36px !important;
+}
+
+/* Observações */
+.textarea-custom {
+  min-height: 60px !important;
+  resize: vertical !important;
+  font-family: 'Inter', sans-serif !important;
+}
+
+/* Cliente selecionado */
+.selected-client-display {
+  background: #E9D9BE !important;
+  padding: 8px 14px !important;
+  border-radius: 8px !important;
+  color: #42192A !important;
+  font-weight: 600 !important;
+  font-size: 14px !important;
+}
