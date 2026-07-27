@@ -360,6 +360,11 @@ const [showFaturamentoModal, setShowFaturamentoModal] = useState(false);
             onStatus={setApptStatus}
             onDelete={deleteAppointment}
             onEdit={(a) => setApptModal({ editing: a })}
+openHojeModal={openHojeModal}
+
+openPendentesModal={openPendentesModal}
+openPrevistoModal={openPrevistoModal}
+openFaturamentoModal={openFaturamentoModal}
           />
         ) : tab === "agenda" ? (
           <AgendaView
