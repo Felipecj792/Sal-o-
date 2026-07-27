@@ -152,7 +152,11 @@ export default function App() {
   const [apptModal, setApptModal] = useState(null);
   const [clientModal, setClientModal] = useState(null);
   const [serviceModal, setServiceModal] = useState(null);
-
+  // Estados para os modais de detalhes
+const [showHojeModal, setShowHojeModal] = useState(false);
+const [showPendentesModal, setShowPendentesModal] = useState(false);
+const [showPrevistoModal, setShowPrevistoModal] = useState(false);
+const [showFaturamentoModal, setShowFaturamentoModal] = useState(false);
   useEffect(() => {
     (async () => {
       const [c, s, a] = await Promise.all([
