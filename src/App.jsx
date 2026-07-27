@@ -833,7 +833,214 @@ function ServicosView({ services, onNew, onEdit, onDelete }) {
     </div>
   );
 }
+ {/* MODAL: Hoje */}
+{showHojeModal && (
+  <Modal title="📋 Atendimentos de Hoje" onClose={() => setShowHojeModal(false)} wide>
+    {todayAppointments.length === 0 ? (
+      <p style={{ textAlign: 'center', color: '#8A7477' }}>Nenhum atendimento para hoje.</p>
+    ) : (
+      todayAppointments.sort((a, b) => a.time.localeCompare(b.time)).map((a) => (
+        <div key={a.id} style={{ 
+          display: 'flex', 
+          justifyContent: 'space-between', 
+          padding: '10px 0', 
+          borderBottom: '1px solid #EEE0DC',
+          alignItems: 'center'
+        }}>
+          <div>
+            <strong style={{ color: '#42192A' }}>{clientMap[a.clientId]?.name || 'Cliente'}</strong>
+            <span style={{ marginLeft: 8, color: '#8A7477', fontSize: 13 }}>
+              {serviceMap[a.serviceId]?.name || 'Serviço'}
+            </span>
+          </div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+            <span style={{ fontWeight: 600, color: '#5B2333' }}>{a.time}</span>
+            <span style={{ 
+              background: a.status === 'concluido' ? '#E7F0E9' : a.status === 'cancelado' ? '#F6E7E7' : '#E9D9BE',
+              color: a.status === 'concluido' ? '#4F7A5B' : a.status === 'cancelado' ? '#A54848' : '#7A5A22',
+              padding: '2px 10px', 
+              borderRadius: 999,
+              fontSize: 10,
+              fontWeight: 700,
+              textTransform: 'uppercase'
+            }}>
+              {a.status === 'agendado' && '📌 Agendado'}
+              {a.status === 'concluido' && '✅ Concluído'}
+              {a.status === 'cancelado' && '❌ Cancelado'}
+            </span>
+          </div>
+        </div>
+      ))
+    )}
+  </Modal>
+)}
 
+{/* MODAL: Pendentes */}
+{showPendentesModal && (
+  <Modal title="⏳ Pendentes para Hoje" onClose={() => setShowPendentesModal(false)} wide>
+    {todayAppointments.filter(a => a.status === 'agendado').length === 0 ? (
+      <p style={{ textAlign: 'center', color: '#8A7477' }}>Nenhum atendimento pendente para hoje. 🎉</p>
+    ) : (
+      todayAppointments.filter(a => a.status === 'agendado').sort((a, b) => a.time.localeCompare(b.time)).map((a) => (
+        <div key={a.id} style={{ 
+          display: 'flex', 
+          justifyContent: 'space-between', 
+          padding: '10px 0', 
+          borderBottom: '1px solid #EEE0DC',
+          alignItems: 'center'
+        }}>
+          <div>
+            <strong style={{ color: '#42192A' }}>{clientMap[a.clientId]?.name || 'Cliente'}</strong>
+            <span style={{ marginLeft: 8, color: '#8A7477', fontSize: 13 }}>
+              {serviceMap[a.serviceId]?.name || 'Serviço'}
+            </span>
+          </div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+            <span style={{ fontWeight: 600, color: '#B8935A' }}>{a.time}</span>
+            <span style={{ 
+              background: '#E9D9BE', 
+              color: '#7A5A22', 
+              padding: '2px 10px', 
+              borderRadius: 999,
+              fontSize: 10,
+              fontWeight: 700,
+              textTransform: 'uppercase'
+            }}>
+              ⏳ Aguardando
+            </span>
+          </div>
+        </div>
+      ))
+    )}
+  </Modal>
+)}
+
+{/* MODAL: Previsto Hoje */}
+{showPrevistoModal && (
+  <Modal title="💰 Previsão de Faturamento Hoje" onClose={() => setShowPrevistoModal(false)} wide>
+    {todayAppointments.filter(a => a.status !== 'cancelado').length === 0 ? (
+      <p style={{ textAlign: 'center', color: '#8A7477' }}>Nenhum serviço previsto para hoje.</p>
+    ) : (
+      <>
+        <div style={{ 
+          background: '#FBF6F3', 
+          padding: '16px', 
+          borderRadius: 12, 
+          marginBottom: 16,
+          border: '1px solid #E9D9BE'
+        }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <span style={{ fontSize: 14, color: '#8A7477' }}>Total previsto para hoje:</span>
+            <span style={{ fontFamily: "'Playfair Display', serif", fontSize: 24, fontWeight: 700, color: '#42192A' }}>
+              {money(todayAppointments.filter(a => a.status !== 'cancelado').reduce((sum, a) => sum + (serviceMap[a.serviceId]?.price || 0), 0))}
+            </span>
+          </div>
+        </div>
+        {todayAppointments.filter(a => a.status !== 'cancelado').sort((a, b) => a.time.localeCompare(b.time)).map((a) => (
+          <div key={a.id} style={{ 
+            display: 'flex', 
+            justifyContent: 'space-between', 
+            padding: '10px 0', 
+            borderBottom: '1px solid #EEE0DC',
+            alignItems: 'center'
+          }}>
+            <div>
+              <strong style={{ color: '#42192A' }}>{clientMap[a.clientId]?.name || 'Cliente'}</strong>
+              <span style={{ marginLeft: 8, color: '#8A7477', fontSize: 13 }}>
+                {serviceMap[a.serviceId]?.name || 'Serviço'}
+              </span>
+            </div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+              <span style={{ fontWeight: 700, color: '#5B2333' }}>{money(serviceMap[a.serviceId]?.price || 0)}</span>
+              <span style={{ fontSize: 13, color: '#8A7477' }}>{a.time}</span>
+            </div>
+          </div>
+        ))}
+      </>
+    )}
+  </Modal>
+)}
+
+{/* MODAL: Faturamento Mensal */}
+{showFaturamentoModal && (
+  <Modal title="📊 Faturamento do Mês" onClose={() => setShowFaturamentoModal(false)} wide>
+    {appointments.filter(a => a.date.startsWith(todayISO.slice(0, 7)) && a.status === 'concluido').length === 0 ? (
+      <p style={{ textAlign: 'center', color: '#8A7477' }}>Nenhum serviço concluído neste mês.</p>
+    ) : (
+      <>
+        <div style={{ 
+          background: '#5B2333', 
+          padding: '16px', 
+          borderRadius: 12, 
+          marginBottom: 16,
+          color: '#fff'
+        }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <span style={{ fontSize: 14, opacity: 0.8 }}>Total faturado em {MONTHS[new Date().getMonth()]}:</span>
+            <span style={{ fontFamily: "'Playfair Display', serif", fontSize: 28, fontWeight: 700 }}>
+              {money(appointments.filter(a => a.date.startsWith(todayISO.slice(0, 7)) && a.status === 'concluido').reduce((sum, a) => sum + (serviceMap[a.serviceId]?.price || 0), 0))}
+            </span>
+          </div>
+        </div>
+        
+        <div style={{ display: 'flex', gap: 12, marginBottom: 16, flexWrap: 'wrap' }}>
+          <div style={{ 
+            background: '#FBF6F3', 
+            padding: '10px 16px', 
+            borderRadius: 8, 
+            flex: 1,
+            border: '1px solid #EEE0DC'
+          }}>
+            <span style={{ fontSize: 12, color: '#8A7477' }}>Atendimentos</span>
+            <div style={{ fontWeight: 700, fontSize: 18, color: '#42192A' }}>
+              {appointments.filter(a => a.date.startsWith(todayISO.slice(0, 7)) && a.status === 'concluido').length}
+            </div>
+          </div>
+          <div style={{ 
+            background: '#FBF6F3', 
+            padding: '10px 16px', 
+            borderRadius: 8, 
+            flex: 1,
+            border: '1px solid #EEE0DC'
+          }}>
+            <span style={{ fontSize: 12, color: '#8A7477' }}>Média por atendimento</span>
+            <div style={{ fontWeight: 700, fontSize: 18, color: '#42192A' }}>
+              {appointments.filter(a => a.date.startsWith(todayISO.slice(0, 7)) && a.status === 'concluido').length > 0 
+                ? money(appointments.filter(a => a.date.startsWith(todayISO.slice(0, 7)) && a.status === 'concluido').reduce((sum, a) => sum + (serviceMap[a.serviceId]?.price || 0), 0) / appointments.filter(a => a.date.startsWith(todayISO.slice(0, 7)) && a.status === 'concluido').length)
+                : 'R$ 0,00'
+              }
+            </div>
+          </div>
+        </div>
+
+        {appointments.filter(a => a.date.startsWith(todayISO.slice(0, 7)) && a.status === 'concluido').sort((a, b) => (b.date + b.time).localeCompare(a.date + a.time)).slice(0, 10).map((a) => (
+          <div key={a.id} style={{ 
+            display: 'flex', 
+            justifyContent: 'space-between', 
+            padding: '8px 0', 
+            borderBottom: '1px solid #EEE0DC',
+            alignItems: 'center',
+            fontSize: 13
+          }}>
+            <div>
+              <span style={{ fontWeight: 600, color: '#42192A' }}>{clientMap[a.clientId]?.name || 'Cliente'}</span>
+              <span style={{ marginLeft: 8, color: '#8A7477' }}>{serviceMap[a.serviceId]?.name || 'Serviço'}</span>
+            </div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+              <span style={{ fontWeight: 600, color: '#5B2333' }}>{money(serviceMap[a.serviceId]?.price || 0)}</span>
+              <span style={{ fontSize: 12, color: '#8A7477' }}>{prettyDateShort(a.date)}</span>
+            </div>
+          </div>
+        ))}
+        {appointments.filter(a => a.date.startsWith(todayISO.slice(0, 7)) && a.status === 'concluido').length > 10 && (
+          <p style={{ textAlign: 'center', color: '#8A7477', fontSize: 12, marginTop: 8 }}>
+            + {appointments.filter(a => a.date.startsWith(todayISO.slice(0, 7)) && a.status === 'concluido').length - 10} outros atendimentos
+          </p>
+        )}
+      </>
+    )}
+  </Modal>
+)}
 function AppointmentModal({ data, clients, services, onClose, onSave, onCreateClient }) {
   const editing = data.editing;
   const [clientMode, setClientMode] = useState("existing");
