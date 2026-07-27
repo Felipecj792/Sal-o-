@@ -403,7 +403,6 @@ export default function App() {
     </div>
   );
 }
-
 function ApptRow({ a, client, service, onStatus, onDelete, onEdit }) {
   const cancelled = a.status === "cancelado";
   return (
@@ -476,4 +475,298 @@ function HojeView({ todayAppointments, clientMap, serviceMap, todayRevenue, mont
 
 function StatCard({ icon: Icon, label, value, sub }) {
   return (
-    <div style={{ background: C.surface, bord
+    <div style={{ background: C.surface, border: "1px solid " + C.border, borderRadius: 16, padding: 16 }}>
+      <div style={{ display: "flex", alignItems: "center", gap: 8, color: C.gold, marginBottom: 8 }}>
+        <Icon size={16} />
+        <span style={{ fontSize: 11.5, fontWeight: 700, textTransform: "uppercase", letterSpacing: 0.4, color: C.textMuted }}>{label}</span>
+      </div>
+      <div style={{ fontFamily: "'Playfair Display', serif", fontSize: 22, fontWeight: 700, color: C.wineDeep }}>{value}</div>
+      <div style={{ fontSize: 12, color: C.textMuted }}>{sub}</div>
+    </div>
+  );
+}
+
+function AgendaView({ currentDate, setCurrentDate, dayAppointments, clientMap, serviceMap, onNew, onStatus, onDelete, onEdit }) {
+  function shiftDay(delta) {
+    const d = new Date(currentDate);
+    d.setDate(d.getDate() + delta);
+    setCurrentDate(d);
+  }
+  const navBtn = { background: "#fff", border: "1px solid " + C.border, borderRadius: 10, width: 34, height: 34, display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", color: C.wineDeep };
+  return (
+    <div>
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 18, gap: 10, flexWrap: "wrap" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+          <button onClick={() => shiftDay(-1)} style={navBtn}><ChevronLeft size={18} /></button>
+          <div style={{ minWidth: 200, textAlign: "center" }}>
+            <div style={{ fontFamily: "'Playfair Display', serif", fontWeight: 700, fontSize: 17, color: C.wineDeep, textTransform: "capitalize" }}>
+              {prettyDate(currentDate)}
+            </div>
+          </div>
+          <button onClick={() => shiftDay(1)} style={navBtn}><ChevronRight size={18} /></button>
+          <Btn small variant="ghost" onClick={() => setCurrentDate(new Date())}>Hoje</Btn>
+        </div>
+        <Btn onClick={onNew}><Plus size={15} /> Novo agendamento</Btn>
+      </div>
+
+      {dayAppointments.length === 0 ? (
+        <EmptyState text="Nenhum agendamento para este dia." cta="Agendar atendimento" onCta={onNew} />
+      ) : (
+        dayAppointments.map((a) => (
+          <ApptRow key={a.id} a={a} client={clientMap[a.clientId]} service={serviceMap[a.serviceId]} onStatus={onStatus} onDelete={onDelete} onEdit={onEdit} />
+        ))
+      )}
+    </div>
+  );
+}
+
+function ClientesView({ clients, search, setSearch, appointments, serviceMap, expandedClient, setExpandedClient, onNew, onEdit, onDelete }) {
+  return (
+    <div>
+      <div style={{ display: "flex", gap: 10, marginBottom: 18, flexWrap: "wrap" }}>
+        <div style={{ flex: 1, minWidth: 200, position: "relative" }}>
+          <Search size={16} style={{ position: "absolute", left: 12, top: 12, color: C.textMuted }} />
+          <input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Buscar por nome ou telefone..." style={{ ...inputStyle, paddingLeft: 36 }} />
+        </div>
+        <Btn onClick={onNew}><Plus size={15} /> Nova cliente</Btn>
+      </div>
+
+      {clients.length === 0 ? (
+        <EmptyState text="Nenhuma cliente encontrada." cta="Cadastrar cliente" onCta={onNew} />
+      ) : (
+        clients.slice().sort((a, b) => a.name.localeCompare(b.name)).map((c) => {
+          const history = appointments.filter((a) => a.clientId === c.id).sort((a, b) => (b.date + b.time).localeCompare(a.date + a.time));
+          const totalSpent = history.filter((a) => a.status === "concluido").reduce((s, a) => s + (serviceMap[a.serviceId]?.price || 0), 0);
+          const expanded = expandedClient === c.id;
+          return (
+            <div key={c.id} style={{ background: C.surface, border: "1px solid " + C.border, borderRadius: 14, marginBottom: 12, overflow: "hidden" }}>
+              <div style={{ padding: 14, display: "flex", justifyContent: "space-between", alignItems: "center", cursor: "pointer" }} onClick={() => setExpandedClient(expanded ? null : c.id)}>
+                <div>
+                  <div style={{ fontWeight: 700, fontSize: 15 }}>{c.name}</div>
+                  <div style={{ fontSize: 13, color: C.textMuted, display: "flex", alignItems: "center", gap: 5, marginTop: 2 }}>
+                    {c.phone && <><Phone size={12} /> {c.phone}</>}
+                    <span style={{ marginLeft: c.phone ? 8 : 0 }}>· {history.length} atendimento{history.length !== 1 ? "s" : ""}</span>
+                  </div>
+                </div>
+                <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                  <span style={{ fontSize: 13, fontWeight: 700, color: C.success }}>{money(totalSpent)}</span>
+                  <button onClick={(e) => { e.stopPropagation(); onEdit(c); }} style={{ background: "none", border: "none", cursor: "pointer", color: C.textMuted, padding: 4 }}><Pencil size={15} /></button>
+                  <button onClick={(e) => { e.stopPropagation(); onDelete(c.id); }} style={{ background: "none", border: "none", cursor: "pointer", color: C.textMuted, padding: 4 }}><Trash2 size={15} /></button>
+                </div>
+              </div>
+              {expanded && (
+                <div style={{ borderTop: "1px solid " + C.border, padding: 14, background: C.bg }}>
+                  {c.notes && <p style={{ fontSize: 13, color: C.textMuted, marginTop: 0, fontStyle: "italic" }}>{c.notes}</p>}
+                  {history.length === 0 ? (
+                    <p style={{ fontSize: 13, color: C.textMuted, margin: 0 }}>Sem histórico de atendimentos ainda.</p>
+                  ) : (
+                    history.map((a) => (
+                      <div key={a.id} style={{ display: "flex", justifyContent: "space-between", fontSize: 13, padding: "6px 0", borderBottom: "1px solid " + C.border }}>
+                        <span>{prettyDateShort(a.date)} · {a.time} — {serviceMap[a.serviceId]?.name || "Serviço removido"}</span>
+                        <StatusBadge status={a.status} />
+                      </div>
+                    ))
+                  )}
+                </div>
+              )}
+            </div>
+          );
+        })
+      )}
+    </div>
+  );
+}
+
+function ServicosView({ services, onNew, onEdit, onDelete }) {
+  return (
+    <div>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 18 }}>
+        <h2 style={{ margin: 0, fontFamily: "'Playfair Display', serif", fontSize: 19, color: C.wineDeep }}>Catálogo de serviços</h2>
+        <Btn onClick={onNew}><Plus size={15} /> Novo serviço</Btn>
+      </div>
+      {services.length === 0 ? (
+        <EmptyState text="Nenhum serviço cadastrado." cta="Cadastrar serviço" onCta={onNew} />
+      ) : (
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(220px,1fr))", gap: 12 }}>
+          {services.map((s) => (
+            <div key={s.id} style={{ background: C.surface, border: "1px solid " + C.border, borderRadius: 14, padding: 16 }}>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
+                <Scissors size={16} color={C.gold} />
+                <div style={{ display: "flex", gap: 4 }}>
+                  <button onClick={() => onEdit(s)} style={{ background: "none", border: "none", cursor: "pointer", color: C.textMuted, padding: 2 }}><Pencil size={14} /></button>
+                  <button onClick={() => onDelete(s.id)} style={{ background: "none", border: "none", cursor: "pointer", color: C.textMuted, padding: 2 }}><Trash2 size={14} /></button>
+                </div>
+              </div>
+              <div style={{ fontWeight: 700, fontSize: 15, marginTop: 10 }}>{s.name}</div>
+              <div style={{ fontSize: 13, color: C.textMuted, marginTop: 4 }}>{s.duration} min</div>
+              <div style={{ fontFamily: "'Playfair Display', serif", fontWeight: 700, fontSize: 18, color: C.wineDeep, marginTop: 8 }}>{money(s.price)}</div>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function AppointmentModal({ data, clients, services, onClose, onSave, onCreateClient }) {
+  const editing = data.editing;
+  const [clientMode, setClientMode] = useState("existing");
+  const [clientId, setClientId] = useState(editing?.clientId || "");
+  const [newName, setNewName] = useState("");
+  const [newPhone, setNewPhone] = useState("");
+  const [serviceId, setServiceId] = useState(editing?.serviceId || services[0]?.id || "");
+  const [date, setDate] = useState(editing?.date || data.defaultDate || toISODate(new Date()));
+  const [time, setTime] = useState(editing?.time || "09:00");
+  const [notes, setNotes] = useState(editing?.notes || "");
+  const [error, setError] = useState("");
+
+  function handleSubmit(e) {
+    e.preventDefault();
+    let finalClientId = clientId;
+    if (clientMode === "new") {
+      if (!newName.trim()) { setError("Informe o nome da cliente."); return; }
+      finalClientId = genId();
+      onCreateClient({ id: finalClientId, name: newName.trim(), phone: newPhone.trim(), notes: "" });
+    } else if (!finalClientId) {
+      setError("Selecione uma cliente.");
+      return;
+    }
+    if (!serviceId) { setError("Selecione um serviço."); return; }
+    if (!date || !time) { setError("Informe data e horário."); return; }
+    onSave({
+      id: editing?.id || genId(),
+      clientId: finalClientId,
+      serviceId,
+      date,
+      time,
+      notes: notes.trim(),
+      status: editing?.status || "agendado",
+    });
+  }
+
+  return (
+    <Modal title={editing ? "Editar agendamento" : "Novo agendamento"} onClose={onClose}>
+      <form onSubmit={handleSubmit}>
+        <Field label="Cliente">
+          {!editing && (
+            <div style={{ display: "flex", gap: 6, marginBottom: 8 }}>
+              <Btn small variant={clientMode === "existing" ? "primary" : "ghost"} onClick={() => setClientMode("existing")} type="button">Já cadastrada</Btn>
+              <Btn small variant={clientMode === "new" ? "primary" : "ghost"} onClick={() => setClientMode("new")} type="button">Nova cliente</Btn>
+            </div>
+          )}
+          {clientMode === "existing" || editing ? (
+            <select value={clientId} onChange={(e) => setClientId(e.target.value)} style={inputStyle}>
+              <option value="">Selecione...</option>
+              {clients.slice().sort((a, b) => a.name.localeCompare(b.name)).map((c) => (
+                <option key={c.id} value={c.id}>{c.name}</option>
+              ))}
+            </select>
+          ) : (
+            <div style={{ display: "flex", gap: 8 }}>
+              <input value={newName} onChange={(e) => setNewName(e.target.value)} placeholder="Nome" style={inputStyle} />
+              <input value={newPhone} onChange={(e) => setNewPhone(e.target.value)} placeholder="Telefone" style={inputStyle} />
+            </div>
+          )}
+        </Field>
+
+        <Field label="Serviço">
+          <select value={serviceId} onChange={(e) => setServiceId(e.target.value)} style={inputStyle}>
+            {services.map((s) => (
+              <option key={s.id} value={s.id}>{s.name} — {money(s.price)}</option>
+            ))}
+          </select>
+        </Field>
+
+        <div style={{ display: "flex", gap: 10 }}>
+          <div style={{ flex: 1 }}>
+            <Field label="Data">
+              <input type="date" value={date} onChange={(e) => setDate(e.target.value)} style={inputStyle} />
+            </Field>
+          </div>
+          <div style={{ flex: 1 }}>
+            <Field label="Horário">
+              <input type="time" value={time} onChange={(e) => setTime(e.target.value)} style={inputStyle} />
+            </Field>
+          </div>
+        </div>
+
+        <Field label="Observações (opcional)">
+          <textarea value={notes} onChange={(e) => setNotes(e.target.value)} rows={2} style={inputStyle} />
+        </Field>
+
+        {error && <p style={{ color: C.danger, fontSize: 13, marginTop: -6 }}>{error}</p>}
+
+        <div style={{ display: "flex", justifyContent: "flex-end", gap: 8, marginTop: 6 }}>
+          <Btn variant="ghost" onClick={onClose} type="button">Cancelar</Btn>
+          <Btn type="submit">{editing ? "Salvar alterações" : "Agendar"}</Btn>
+        </div>
+      </form>
+    </Modal>
+  );
+}
+
+function ClientModal({ data, onClose, onSave }) {
+  const editing = data.editing;
+  const [name, setName] = useState(editing?.name || "");
+  const [phone, setPhone] = useState(editing?.phone || "");
+  const [notes, setNotes] = useState(editing?.notes || "");
+  const [error, setError] = useState("");
+
+  function handleSubmit(e) {
+    e.preventDefault();
+    if (!name.trim()) { setError("Informe o nome da cliente."); return; }
+    onSave({ id: editing?.id || genId(), name: name.trim(), phone: phone.trim(), notes: notes.trim() });
+  }
+
+  return (
+    <Modal title={editing ? "Editar cliente" : "Nova cliente"} onClose={onClose}>
+      <form onSubmit={handleSubmit}>
+        <Field label="Nome"><input value={name} onChange={(e) => setName(e.target.value)} style={inputStyle} autoFocus /></Field>
+        <Field label="Telefone"><input value={phone} onChange={(e) => setPhone(e.target.value)} style={inputStyle} placeholder="(00) 00000-0000" /></Field>
+        <Field label="Observações (preferências, alergias, etc.)">
+          <textarea value={notes} onChange={(e) => setNotes(e.target.value)} rows={3} style={inputStyle} />
+        </Field>
+        {error && <p style={{ color: C.danger, fontSize: 13, marginTop: -6 }}>{error}</p>}
+        <div style={{ display: "flex", justifyContent: "flex-end", gap: 8, marginTop: 6 }}>
+          <Btn variant="ghost" onClick={onClose} type="button">Cancelar</Btn>
+          <Btn type="submit">Salvar</Btn>
+        </div>
+      </form>
+    </Modal>
+  );
+}
+
+function ServiceModal({ data, onClose, onSave }) {
+  const editing = data.editing;
+  const [name, setName] = useState(editing?.name || "");
+  const [duration, setDuration] = useState(editing?.duration || 30);
+  const [price, setPrice] = useState(editing?.price ?? 0);
+  const [error, setError] = useState("");
+
+  function handleSubmit(e) {
+    e.preventDefault();
+    if (!name.trim()) { setError("Informe o nome do serviço."); return; }
+    onSave({ id: editing?.id || genId(), name: name.trim(), duration: Number(duration), price: Number(price) });
+  }
+
+  return (
+    <Modal title={editing ? "Editar serviço" : "Novo serviço"} onClose={onClose}>
+      <form onSubmit={handleSubmit}>
+        <Field label="Nome do serviço"><input value={name} onChange={(e) => setName(e.target.value)} style={inputStyle} autoFocus /></Field>
+        <div style={{ display: "flex", gap: 10 }}>
+          <div style={{ flex: 1 }}>
+            <Field label="Duração (min)"><input type="number" min={5} step={5} value={duration} onChange={(e) => setDuration(e.target.value)} style={inputStyle} /></Field>
+          </div>
+          <div style={{ flex: 1 }}>
+            <Field label="Preço (R$)"><input type="number" min={0} step={5} value={price} onChange={(e) => setPrice(e.target.value)} style={inputStyle} /></Field>
+          </div>
+        </div>
+        {error && <p style={{ color: C.danger, fontSize: 13, marginTop: -6 }}>{error}</p>}
+        <div style={{ display: "flex", justifyContent: "flex-end", gap: 8, marginTop: 6 }}>
+          <Btn variant="ghost" onClick={onClose} type="button">Cancelar</Btn>
+          <Btn type="submit">Salvar</Btn>
+        </div>
+      </form>
+    </Modal>
+  );
+}
