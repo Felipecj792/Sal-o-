@@ -561,4 +561,4 @@ function ClientesView({ clients, search, setSearch, appointments, serviceMap, ex
                   <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
                     <span style={{ fontSize: 13, fontWeight: 700, color: C.success }}>{money(totalSpent)}</span>
                     <button onClick={(e) => { e.stopPropagation(); onEdit(c); }} style={{ background: "none", border: "none", cursor: "pointer", color: C.textMuted, padding: 4 }}><Pencil size={15} /></button>
-                    <button onClick={(e) => { e.stopPropagation(); onDelete(c.id); }} style={{ background: "none", border: "none", cursor: "pointer", color: C.textMuted, padding: 4 }}><Trash2 size={15} 
+<button onClick={(e) => { e.stopPropagation(); onDelete(c.id); }} style={{ background: "none", border: "none", cursor: "pointer", color: C.textMuted, padding: 4 }}><Trash2 size={15} /></button>
