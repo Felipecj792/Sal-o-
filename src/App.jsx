@@ -405,38 +405,231 @@ export default function App() {
 }
 function ApptRow({ a, client, service, onStatus, onDelete, onEdit }) {
   const cancelled = a.status === "cancelado";
+  const statusColors = {
+    agendado: { bg: C.goldSoft, color: "#7A5A22" },
+    concluido: { bg: C.successBg, color: C.success },
+    cancelado: { bg: C.dangerBg, color: C.danger },
+  };
+  const currentStatus = statusColors[a.status] || statusColors.agendado;
+
   return (
-    <div style={{ display: "flex", gap: 14 }}>
-      <div style={{ display: "flex", flexDirection: "column", alignItems: "center", width: 54, flexShrink: 0 }}>
-        <span style={{ fontFamily: "'Playfair Display', serif", fontWeight: 700, fontSize: 16, color: C.wineDeep }}>{a.time}</span>
-        <div style={{ width: 2, flex: 1, background: C.goldSoft, marginTop: 4, borderRadius: 2, minHeight: 20 }} />
-      </div>
+    <div
+      style={{
+        display: "flex",
+        gap: 14,
+        marginBottom: 16,
+        background: C.surface,
+        borderRadius: 16,
+        padding: "14px 18px",
+        border: "1px solid " + C.border,
+        boxShadow: "0 2px 8px rgba(91, 35, 51, 0.06)",
+        transition: "transform 0.2s ease, box-shadow 0.2s ease",
+        opacity: cancelled ? 0.6 : 1,
+        cursor: "default",
+      }}
+    >
+      {/* Horário */}
       <div
         style={{
-          flex: 1, background: C.surface, border: "1px solid " + C.border, borderLeft: "3px solid " + (cancelled ? C.textMuted : C.gold),
-          borderRadius: 14, padding: "12px 16px", marginBottom: 16, opacity: cancelled ? 0.6 : 1,
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          justifyContent: "center",
+          minWidth: 56,
+          background: C.blush,
+          borderRadius: 12,
+          padding: "6px 10px",
         }}
       >
+        <span
+          style={{
+            fontFamily: "'Playfair Display', serif",
+            fontWeight: 700,
+            fontSize: 18,
+            color: C.wineDeep,
+            lineHeight: 1.2,
+          }}
+        >
+          {a.time}
+        </span>
+        <span
+          style={{
+            fontSize: 9,
+            fontWeight: 600,
+            textTransform: "uppercase",
+            color: C.textMuted,
+            letterSpacing: 0.5,
+          }}
+        >
+          Horário
+        </span>
+      </div>
+
+      {/* Conteúdo principal */}
+      <div style={{ flex: 1, display: "flex", flexDirection: "column", gap: 6 }}>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 10 }}>
           <div>
-            <div style={{ fontWeight: 700, fontSize: 15, textDecoration: cancelled ? "line-through" : "none" }}>{client?.name || "Cliente removido"}</div>
-            <div style={{ fontSize: 13, color: C.textMuted, marginTop: 2 }}>{service?.name || "Serviço removido"} · {service ? money(service.price) : ""}</div>
-            {a.notes && <div style={{ fontSize: 12.5, color: C.textMuted, marginTop: 4, fontStyle: "italic" }}>{a.notes}</div>}
+            <div
+              style={{
+                fontWeight: 700,
+                fontSize: 16,
+                color: C.wineDeep,
+                textDecoration: cancelled ? "line-through" : "none",
+              }}
+            >
+              {client?.name || "Cliente removido"}
+            </div>
+            <div style={{ fontSize: 13, color: C.textMuted, marginTop: 1 }}>
+              {service?.name || "Serviço removido"}
+              <span style={{ fontWeight: 600, color: C.wine, marginLeft: 6 }}>
+                {service ? money(service.price) : ""}
+              </span>
+            </div>
+            {a.notes && (
+              <div
+                style={{
+                  fontSize: 12.5,
+                  color: C.textMuted,
+                  marginTop: 4,
+                  fontStyle: "italic",
+                  background: C.bg,
+                  padding: "2px 10px",
+                  borderRadius: 8,
+                  display: "inline-block",
+                }}
+              >
+                ✏️ {a.notes}
+              </div>
+            )}
           </div>
-          <StatusBadge status={a.status} />
+
+          {/* Status */}
+          <span
+            style={{
+              background: currentStatus.bg,
+              color: currentStatus.color,
+              fontSize: 10,
+              fontWeight: 700,
+              padding: "4px 12px",
+              borderRadius: 999,
+              textTransform: "uppercase",
+              letterSpacing: 0.5,
+              whiteSpace: "nowrap",
+            }}
+          >
+            {a.status === "agendado" && "📌 Agendado"}
+            {a.status === "concluido" && "✅ Concluído"}
+            {a.status === "cancelado" && "❌ Cancelado"}
+          </span>
         </div>
-        <div style={{ display: "flex", gap: 6, marginTop: 10, flexWrap: "wrap" }}>
-          {a.status !== "concluido" && <Btn small variant="subtle" onClick={() => onStatus(a.id, "concluido")}><Check size={13} /> Concluir</Btn>}
-          {a.status !== "cancelado" && <Btn small variant="ghost" onClick={() => onStatus(a.id, "cancelado")}><Ban size={13} /> Cancelar</Btn>}
-          {a.status === "cancelado" && <Btn small variant="ghost" onClick={() => onStatus(a.id, "agendado")}>Reativar</Btn>}
-          <Btn small variant="ghost" onClick={() => onEdit(a)}><Pencil size={13} /> Editar</Btn>
-          <Btn small variant="danger" onClick={() => onDelete(a.id)}><Trash2 size={13} /></Btn>
+
+        {/* Botões de ação */}
+        <div style={{ display: "flex", gap: 6, flexWrap: "wrap", marginTop: 4 }}>
+          {a.status !== "concluido" && (
+            <button
+              onClick={() => onStatus(a.id, "concluido")}
+              style={{
+                background: C.successBg,
+                border: "none",
+                borderRadius: 8,
+                padding: "4px 12px",
+                fontSize: 12,
+                fontWeight: 600,
+                color: C.success,
+                cursor: "pointer",
+                display: "flex",
+                alignItems: "center",
+                gap: 4,
+                transition: "background 0.2s",
+              }}
+            >
+              <Check size={13} /> Concluir
+            </button>
+          )}
+          {a.status !== "cancelado" && (
+            <button
+              onClick={() => onStatus(a.id, "cancelado")}
+              style={{
+                background: C.dangerBg,
+                border: "none",
+                borderRadius: 8,
+                padding: "4px 12px",
+                fontSize: 12,
+                fontWeight: 600,
+                color: C.danger,
+                cursor: "pointer",
+                display: "flex",
+                alignItems: "center",
+                gap: 4,
+                transition: "background 0.2s",
+              }}
+            >
+              <Ban size={13} /> Cancelar
+            </button>
+          )}
+          {a.status === "cancelado" && (
+            <button
+              onClick={() => onStatus(a.id, "agendado")}
+              style={{
+                background: C.goldSoft,
+                border: "none",
+                borderRadius: 8,
+                padding: "4px 12px",
+                fontSize: 12,
+                fontWeight: 600,
+                color: "#7A5A22",
+                cursor: "pointer",
+                display: "flex",
+                alignItems: "center",
+                gap: 4,
+              }}
+            >
+              ↻ Reativar
+            </button>
+          )}
+          <button
+            onClick={() => onEdit(a)}
+            style={{
+              background: "transparent",
+              border: "1px solid " + C.border,
+              borderRadius: 8,
+              padding: "4px 12px",
+              fontSize: 12,
+              fontWeight: 600,
+              color: C.textMuted,
+              cursor: "pointer",
+              display: "flex",
+              alignItems: "center",
+              gap: 4,
+              transition: "background 0.2s",
+            }}
+          >
+            <Pencil size={13} /> Editar
+          </button>
+          <button
+            onClick={() => onDelete(a.id)}
+            style={{
+              background: "transparent",
+              border: "1px solid " + C.dangerBg,
+              borderRadius: 8,
+              padding: "4px 12px",
+              fontSize: 12,
+              fontWeight: 600,
+              color: C.danger,
+              cursor: "pointer",
+              display: "flex",
+              alignItems: "center",
+              gap: 4,
+              transition: "background 0.2s",
+            }}
+          >
+            <Trash2 size={13} /> Excluir
+          </button>
         </div>
       </div>
     </div>
   );
 }
-
 function EmptyState({ text, cta, onCta }) {
   return (
     <div style={{ textAlign: "center", padding: "40px 20px", color: C.textMuted, background: C.surface, borderRadius: 16, border: "1px dashed " + C.border }}>
