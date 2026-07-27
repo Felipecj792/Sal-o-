@@ -139,22 +139,7 @@ function StatusBadge({ status }) {
     </span>
   );
 }
-// Funções para abrir os modais
-function openHojeModal() {
-  setShowHojeModal(true);
-}
 
-function openPendentesModal() {
-  setShowPendentesModal(true);
-}
-
-function openPrevistoModal() {
-  setShowPrevistoModal(true);
-}
-
-function openFaturamentoModal() {
-  setShowFaturamentoModal(true);
-}
 export default function App() {
   const [loaded, setLoaded] = useState(false);
   const [clients, setClients] = useState([]);
@@ -172,6 +157,22 @@ const [showHojeModal, setShowHojeModal] = useState(false);
 const [showPendentesModal, setShowPendentesModal] = useState(false);
 const [showPrevistoModal, setShowPrevistoModal] = useState(false);
 const [showFaturamentoModal, setShowFaturamentoModal] = useState(false);
+// Funções para abrir os modais
+function openHojeModal() {
+  setShowHojeModal(true);
+}
+
+function openPendentesModal() {
+  setShowPendentesModal(true);
+}
+
+function openPrevistoModal() {
+  setShowPrevistoModal(true);
+}
+
+function openFaturamentoModal() {
+  setShowFaturamentoModal(true);
+}
   useEffect(() => {
     (async () => {
       const [c, s, a] = await Promise.all([
