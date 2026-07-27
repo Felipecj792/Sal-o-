@@ -139,7 +139,22 @@ function StatusBadge({ status }) {
     </span>
   );
 }
+// Funções para abrir os modais
+function openHojeModal() {
+  setShowHojeModal(true);
+}
 
+function openPendentesModal() {
+  setShowPendentesModal(true);
+}
+
+function openPrevistoModal() {
+  setShowPrevistoModal(true);
+}
+
+function openFaturamentoModal() {
+  setShowFaturamentoModal(true);
+}
 export default function App() {
   const [loaded, setLoaded] = useState(false);
   const [clients, setClients] = useState([]);
