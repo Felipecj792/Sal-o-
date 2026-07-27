@@ -658,15 +658,24 @@ function EmptyState({ text, cta, onCta }) {
   );
 }
 
-function HojeView({ todayAppointments, clientMap, serviceMap, todayRevenue, monthRevenue, onNew, onStatus, onDelete, onEdit }) {
+function HojeView({ todayAppointments, clientMap, serviceMap, todayRevenue, monthRevenue, onNew, onStatus, onDelete, onEdit, openHojeModal, openPendentesModal, openPrevistoModal, openFaturamentoModal }) {
   const pending = todayAppointments.filter((a) => a.status === "agendado").length;
+  
   return (
     <div>
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(150px,1fr))", gap: 12, marginBottom: 22 }}>
-        <StatCard icon={Calendar} label="Hoje" value={String(todayAppointments.length)} sub="atendimentos" />
-        <StatCard icon={Clock} label="Pendentes" value={String(pending)} sub="a atender" />
-        <StatCard icon={DollarSign} label="Previsto hoje" value={money(todayRevenue)} sub="em serviços" />
-        <StatCard icon={Sparkles} label="Faturado no mês" value={money(monthRevenue)} sub="concluídos" />
+        <div onClick={openHojeModal} style={{ cursor: 'pointer' }}>
+          <StatCard icon={Calendar} label="Hoje" value={String(todayAppointments.length)} sub="atendimentos" />
+        </div>
+        <div onClick={openPendentesModal} style={{ cursor: 'pointer' }}>
+          <StatCard icon={Clock} label="Pendentes" value={String(pending)} sub="a atender" />
+        </div>
+        <div onClick={openPrevistoModal} style={{ cursor: 'pointer' }}>
+          <StatCard icon={DollarSign} label="Previsto hoje" value={money(todayRevenue)} sub="em serviços" />
+        </div>
+        <div onClick={openFaturamentoModal} style={{ cursor: 'pointer' }}>
+          <StatCard icon={Sparkles} label="Faturado no mês" value={money(monthRevenue)} sub="concluídos" />
+        </div>
       </div>
 
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14 }}>
